@@ -1,0 +1,20 @@
+[
+  {
+    "id": "rec_1788709603702_jpi8mz",
+    "name": "yuki yana",
+    "timeSec": 210,
+    "moves": 61,
+    "difficulty": "beginner",
+    "hintUsed": true,
+    "createdAt": "2026-09-06T15:46:43.702Z"
+  },
+  {
+    "id": "rec_1788711062991_c7pjau",
+    "name": "yuki yana",
+    "timeSec": 153,
+    "moves": 38,
+    "difficulty": "beginner",
+    "hintUsed": true,
+    "createdAt": "2026-09-06T16:11:02.991Z"
+  }
+]

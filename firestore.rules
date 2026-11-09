@@ -1,0 +1,14 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /rankings/{rankingId} {
+      allow read: if true;
+      allow create: if request.resource.data.name is string
+                    && request.resource.data.timeSec is number
+                    && request.resource.data.moves is number
+                    && request.resource.data.difficulty in ['beginner', 'normal', 'hard', 'master']
+                    && request.resource.data.hintUsed is bool;
+      allow update, delete: if false;
+    }
+  }
+}

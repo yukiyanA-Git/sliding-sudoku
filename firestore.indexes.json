@@ -1,0 +1,24 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "rankings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "difficulty", "order": "ASCENDING" },
+        { "fieldPath": "timeSec", "order": "ASCENDING" },
+        { "fieldPath": "moves", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "rankings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "difficulty", "order": "ASCENDING" },
+        { "fieldPath": "hintUsed", "order": "ASCENDING" },
+        { "fieldPath": "timeSec", "order": "ASCENDING" },
+        { "fieldPath": "moves", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

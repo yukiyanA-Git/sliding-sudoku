@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head><title>Drag Test</title></head>
+<body>
+<iframe id="game" src="../index.html" style="width:1000px; height:900px; border:none;"></iframe>
+<script>
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const iframe = document.getElementById('game');
+    const doc = iframe.contentDocument || iframe.contentWindow.document;
+    const win = iframe.contentWindow;
+
+    const slidableTile = doc.querySelector('.tile.tile-movable.slidable');
+    if (!slidableTile) {
+      document.title = "RESULT_NO_SLIDABLE";
+      return;
+    }
+
+    const rect = slidableTile.getBoundingClientRect();
+    const startX = rect.left + rect.width / 2;
+    const startY = rect.top + rect.height / 2;
+
+    // Pointer down
+    slidableTile.dispatchEvent(new win.PointerEvent('pointerdown', {
+      bubbles: true,
+      cancelable: true,
+      button: 0,
+      clientX: startX,
+      clientY: startY,
+      pointerId: 1
+    }));
+
+    // Pointer move (drag in horizontal & vertical to trigger move)
+    win.dispatchEvent(new win.PointerEvent('pointermove', {
+      bubbles: true,
+      clientX: startX + 50,
+      clientY: startY + 50,
+      pointerId: 1
+    }));
+
+    // Pointer up
+    win.dispatchEvent(new win.PointerEvent('pointerup', {
+      bubbles: true,
+      clientX: startX + 50,
+      clientY: startY + 50,
+      pointerId: 1
+    }));
+
+    setTimeout(() => {
+      const moves = doc.getElementById('moves-val').textContent;
+      document.title = "MOVES_" + moves;
+    }, 400);
+  }, 600);
+});
+</script>
+</body>
+</html>

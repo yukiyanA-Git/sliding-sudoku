@@ -1,0 +1,5 @@
+# Firebase / Local cache
+.firebase/
+.DS_Store
+Thumbs.db
+*.log

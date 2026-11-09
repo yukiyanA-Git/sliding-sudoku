@@ -1,0 +1,1267 @@
+/* ==========================================================================
+   スライド数独（Sliding Sudoku）スタイルシート
+   ========================================================================== */
+
+:root {
+  --bg-main: #0b0f19;
+  --bg-surface: #151d2f;
+  --bg-surface-elevated: #1e293b;
+  --bg-slot: #0d1322;
+  
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --primary-glow: rgba(59, 130, 246, 0.4);
+  
+  --accent-gold: #f59e0b;
+  --accent-green: #10b981;
+  --accent-red: #ef4444;
+  --accent-red-glow: rgba(239, 68, 68, 0.35);
+  
+  --tile-movable-bg: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
+  --tile-movable-text: #0f172a;
+  --tile-movable-shadow: 0 4px 10px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(255, 255, 255, 0.3) inset;
+  
+  --tile-fixed-bg: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+  --tile-fixed-text: #94a3b8;
+  --tile-fixed-border: #475569;
+  
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-light: rgba(255, 255, 255, 0.08);
+  --border-block: #475569;
+  
+  --board-size: min(90vw, 82vh, 580px);
+  --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body {
+  background: radial-gradient(circle at 50% 10%, #1e293b 0%, var(--bg-main) 100%);
+  color: var(--text-main);
+  font-family: var(--font-family);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 12px;
+  overflow-x: hidden;
+}
+
+/* アプリケーション全体コンテナ */
+.app-container {
+  width: 100%;
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ヘッダー */
+header.app-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(21, 29, 47, 0.7);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  border: 1px solid var(--border-light);
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 800;
+  color: white;
+  box-shadow: 0 4px 12px var(--primary-glow);
+}
+
+.logo-text h1 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background: linear-gradient(90deg, #ffffff, #93c5fd);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.logo-text p {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-btn {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-light);
+  color: var(--text-main);
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+  background: #273549;
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+/* 難易度セレクター */
+.difficulty-bar {
+  width: 100%;
+  display: flex;
+  gap: 6px;
+  background: rgba(13, 19, 34, 0.8);
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+}
+
+.diff-btn {
+  flex: 1;
+  padding: 7px 4px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.diff-btn:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.diff-btn.active {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 2px 8px var(--primary-glow);
+}
+
+/* ゲームステータスバー (タイマー・手数・コンフリクト) */
+.status-bar {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.status-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  padding: 8px 12px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-card .label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.status-card .value {
+  font-size: 1.15rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-main);
+}
+
+.status-card.conflicts .value.ok {
+  color: var(--accent-green);
+}
+
+.status-card.conflicts .value.has-conflicts {
+  color: var(--accent-gold);
+}
+
+/* メインゲーム盤面コンテナ */
+.board-wrapper {
+  position: relative;
+  width: var(--board-size);
+  height: var(--board-size);
+  background: #0f172a;
+  border: 4px solid var(--border-block);
+  border-radius: 16px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 4px;
+  padding: 3px;
+  background-color: var(--border-block);
+}
+
+/* 3x3 ブロック */
+.sudoku-block {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-surface);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* スロット背景（空きマスグリッド） */
+.slot-bg-grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 3px;
+  padding: 3px;
+  pointer-events: auto;
+}
+
+.slot-bg {
+  background: var(--bg-slot);
+  border-radius: 6px;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.6);
+  border: 1px dashed rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+}
+
+/* タイル要素レイヤー */
+.tiles-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* 個別タイル */
+.tile {
+  position: absolute;
+  pointer-events: auto !important;
+  width: calc(33.333% - 4px);
+  height: calc(33.333% - 4px);
+  margin: 2px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(1.2rem, 3.8vw, 1.8rem);
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  transition: left 0.16s cubic-bezier(0.25, 1, 0.5, 1), 
+              top 0.16s cubic-bezier(0.25, 1, 0.5, 1), 
+              box-shadow 0.2s ease, 
+              background 0.2s ease,
+              transform 0.12s ease;
+  z-index: 2;
+}
+
+/* 可動タイル */
+.tile.tile-movable {
+  pointer-events: auto !important;
+  font-family: var(--font-family);
+  font-style: normal;
+  font-weight: 700;
+  font-size: clamp(1.25rem, 4vw, 1.85rem);
+  background: var(--tile-movable-bg);
+  color: var(--tile-movable-text);
+  box-shadow: var(--tile-movable-shadow);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  touch-action: none;
+  cursor: grab;
+}
+
+.tile.tile-movable:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
+}
+
+.tile.tile-movable.grabbing {
+  cursor: grabbing !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6) !important;
+  filter: brightness(1.04);
+}
+
+.tile.tile-movable.slidable {
+  border-color: #93c5fd;
+}
+
+.tile.tile-movable.slidable::after {
+  content: '';
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  background: var(--primary);
+  border-radius: 50%;
+  top: 5px;
+  right: 5px;
+  box-shadow: 0 0 6px var(--primary-glow);
+}
+
+/* 固定タイル（動かせない数字・土台プレート） */
+.tile.tile-fixed {
+  font-family: 'Times New Roman', 'Georgia', 'Yu Mincho', 'Hiragino Mincho ProN', serif;
+  font-style: italic;
+  font-weight: 800;
+  font-size: clamp(1.35rem, 4.4vw, 2.05rem);
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  color: #f8fafc;
+  border: 2.5px solid #000000 !important; /* 黒枠で固定数字を明確に区別 */
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5), 0 2px 5px rgba(0, 0, 0, 0.4);
+  cursor: default;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* 固定プレートの装飾：内枠＆固定(FIX)バッジ */
+.tile.tile-fixed::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border: 1px dashed rgba(203, 213, 225, 0.35);
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.tile.tile-fixed::after {
+  content: 'FIX';
+  position: absolute;
+  top: 2px;
+  right: 3px;
+  font-size: 8px;
+  font-family: var(--font-family);
+  font-style: normal;
+  font-weight: 800;
+  color: #cbd5e1;
+  letter-spacing: 0.05em;
+  opacity: 0.9;
+}
+
+/* 同一数字ハイライト */
+.tile.same-number {
+  background: linear-gradient(135deg, #fef08a 0%, #fde047 100%) !important;
+  color: #713f12 !important;
+  box-shadow: 0 0 14px rgba(250, 204, 21, 0.8), 0 2px 4px rgba(0,0,0,0.3) !important;
+  z-index: 5;
+}
+
+/* 重複（コンフリクト）警告ハイライト */
+.tile.has-conflict {
+  background: linear-gradient(135deg, #fecaca 0%, #f87171 100%) !important;
+  color: #7f1d1d !important;
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 12px var(--accent-red-glow), 0 2px 4px rgba(0,0,0,0.4) !important;
+  animation: gentleShake 0.4s ease;
+}
+
+/* ヒント・重複表示時および同一数字選択時も、FIXタイルの黒枠を最前面で維持 */
+.tile.tile-fixed.has-conflict {
+  border: 3px solid #000000 !important;
+  box-shadow: 0 0 14px var(--accent-red-glow), inset 0 0 0 1px #000000 !important;
+}
+
+.tile.tile-fixed.has-conflict::before {
+  border: 1px dashed rgba(0, 0, 0, 0.45) !important;
+}
+
+.tile.tile-fixed.has-conflict::after {
+  color: #000000 !important;
+  font-weight: 900;
+  background: rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid rgba(0, 0, 0, 0.3) !important;
+  padding: 0 3px !important;
+  border-radius: 2px !important;
+}
+
+.tile.tile-fixed.same-number {
+  border: 3px solid #000000 !important;
+  box-shadow: 0 0 14px rgba(250, 204, 21, 0.8), inset 0 0 0 1px #000000 !important;
+}
+
+.tile.tile-fixed.same-number::before {
+  border: 1px dashed rgba(0, 0, 0, 0.45) !important;
+}
+
+.tile.tile-fixed.same-number::after {
+  color: #000000 !important;
+  font-weight: 900;
+  background: rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid rgba(0, 0, 0, 0.3) !important;
+  padding: 0 3px !important;
+  border-radius: 2px !important;
+}
+
+/* ヒント対象タイル */
+.tile.hint-target {
+  box-shadow: 0 0 18px #38bdf8, 0 0 30px #38bdf8 !important;
+  border: 2px solid #38bdf8 !important;
+  animation: pulseHint 0.8s infinite alternate ease-in-out;
+  z-index: 6;
+}
+
+/* ゴールプレビューモード */
+.board-wrapper.preview-mode .tile {
+  opacity: 0.35;
+}
+.board-wrapper.preview-mode .tile.preview-ghost {
+  opacity: 0.95;
+  background: linear-gradient(135deg, #a7f3d0 0%, #34d399 100%) !important;
+  color: #064e3b !important;
+  border: 1px dashed #059669 !important;
+}
+
+/* 行・列の完成グローライン */
+.row-line, .col-line {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  transition: all 0.3s;
+}
+
+/* アニメーション定義 */
+@keyframes gentleShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+
+@keyframes pulseHint {
+  from { transform: scale(0.96); box-shadow: 0 0 10px #38bdf8; }
+  to { transform: scale(1.02); box-shadow: 0 0 22px #38bdf8, 0 0 35px #0284c7; }
+}
+
+/* コントロールツールバー */
+.controls-bar {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  color: var(--text-main);
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.action-btn:hover:not(:disabled) {
+  background: var(--bg-surface-elevated);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.action-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.action-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.action-btn.primary {
+  background: var(--primary);
+  border-color: #60a5fa;
+  color: white;
+  box-shadow: 0 2px 8px var(--primary-glow);
+}
+
+.action-btn.primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+/* 重複ヒントON時のアクティブスタイル */
+.action-btn.active-hint {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+  border-color: #f87171 !important;
+  color: white !important;
+  box-shadow: 0 2px 10px rgba(239, 68, 68, 0.45) !important;
+  animation: pulseHintBtn 1.5s infinite alternate;
+}
+
+@keyframes pulseHintBtn {
+  from { box-shadow: 0 0 6px rgba(239, 68, 68, 0.4); }
+  to { box-shadow: 0 0 14px rgba(239, 68, 68, 0.7); }
+}
+
+/* 難易度による使用不可（ロック）ボタンスタイル */
+.action-btn.disabled-lock {
+  opacity: 0.35 !important;
+  cursor: not-allowed !important;
+  background: rgba(15, 23, 42, 0.5) !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+  color: #64748b !important;
+}
+
+/* フッターヘルプ */
+.footer-tips {
+  width: 100%;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  padding: 4px;
+}
+
+/* モーダル */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(5, 8, 16, 0.8);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  padding: 16px;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 440px;
+  padding: 24px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.8);
+  transform: scale(0.95);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-overlay.active .modal-card {
+  transform: scale(1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.modal-body {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rule-box {
+  background: rgba(13, 19, 34, 0.6);
+  padding: 12px;
+  border-radius: 10px;
+  border-left: 3px solid var(--primary);
+}
+
+.rule-box h4 {
+  color: white;
+  margin-bottom: 4px;
+  font-size: 0.9rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 8px 0;
+}
+
+.stat-item {
+  background: rgba(13, 19, 34, 0.8);
+  padding: 12px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.stat-item .stat-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.stat-item .stat-val {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #60a5fa;
+  margin-top: 4px;
+}
+
+/* 紙吹雪キャンバス */
+#confetti-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 99;
+}
+
+/* 通知トースト */
+.game-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(30, 41, 59, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--primary);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 9999px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 200;
+}
+
+.game-toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* 盤面リフレッシュアニメーション */
+.board-wrapper.board-refresh {
+  animation: boardPulse 0.35s ease-out;
+}
+
+@keyframes boardPulse {
+  0% { transform: scale(0.98); filter: brightness(1.15); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+
+/* 空きマスへの誘導パルスアニメーション */
+.slot-bg.pulse-empty {
+  background: rgba(56, 189, 248, 0.45) !important;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.8), inset 0 0 8px rgba(56, 189, 248, 0.5) !important;
+  border: 2px dashed #38bdf8 !important;
+  animation: pulseSlot 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes pulseSlot {
+  0% { transform: scale(0.95); opacity: 0.7; }
+  100% { transform: scale(1.02); opacity: 1; }
+}
+
+/* ==========================================================================
+   オンラインランキング ＆ 自社広告 ＆ クリア拡張スタイル
+   ========================================================================== */
+
+/* モーダル拡張 */
+.modal-card.modal-large {
+  max-width: 580px;
+}
+
+.win-badge-row {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 6px 0 12px;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  border: 1px solid var(--border-light);
+}
+
+.status-badge.success {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+.status-badge.warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+/* クリア画面ランキング登録ボックス */
+.ranking-register-box {
+  background: rgba(13, 19, 34, 0.75);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin: 10px 0;
+  text-align: left;
+}
+
+.register-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #93c5fd;
+  margin-bottom: 8px;
+}
+
+.register-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.register-input-row input {
+  flex: 1;
+  background: #090d16;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #f8fafc;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.register-input-row input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary-glow);
+}
+
+.register-status {
+  font-size: 0.78rem;
+  margin-top: 6px;
+  min-height: 1.2em;
+  color: #10b981;
+  font-weight: 600;
+}
+
+.register-status.error {
+  color: #ef4444;
+}
+
+.modal-actions-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.modal-actions-row .action-btn {
+  flex: 1;
+  justify-content: center;
+}
+
+/* クリア画面内ミニ広告 */
+.win-promo-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(30, 41, 59, 0.45);
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-top: 10px;
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.win-promo-text {
+  text-align: left;
+}
+
+.win-promo-link {
+  color: #60a5fa;
+  text-decoration: none;
+  font-weight: 700;
+  white-space: nowrap;
+  padding-left: 8px;
+}
+
+.win-promo-link:hover {
+  text-decoration: underline;
+}
+
+/* ランキングモーダル内部パーツ */
+.ranking-period-tabs {
+  display: flex;
+  gap: 6px;
+  background: rgba(13, 19, 34, 0.8);
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+}
+
+.rank-tab-btn {
+  flex: 1;
+  padding: 8px 6px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.rank-tab-btn.active {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 2px 8px var(--primary-glow);
+}
+
+.ranking-filters-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.rank-diff-group {
+  display: flex;
+  gap: 4px;
+}
+
+.rank-diff-btn {
+  padding: 5px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-light);
+  color: var(--text-muted);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.rank-diff-btn.active {
+  background: #2563eb;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.no-hint-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: #34d399;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.no-hint-toggle input[type="checkbox"] {
+  cursor: pointer;
+  accent-color: #10b981;
+}
+
+.ranking-table-wrapper {
+  max-height: 380px;
+  overflow-y: auto;
+  border-radius: 10px;
+  background: rgba(13, 19, 34, 0.7);
+  border: 1px solid var(--border-light);
+  margin-top: 4px;
+}
+
+.ranking-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.ranking-table th {
+  position: sticky;
+  top: 0;
+  background: #151d2f;
+  color: var(--text-muted);
+  padding: 8px 8px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-light);
+  z-index: 2;
+  font-size: 0.76rem;
+}
+
+.ranking-table td {
+  padding: 8px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--text-main);
+  vertical-align: middle;
+}
+
+.ranking-table tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.ranking-table tr.highlight-new {
+  background: rgba(59, 130, 246, 0.2) !important;
+  box-shadow: inset 0 0 0 1px #3b82f6;
+}
+
+.rank-num-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-weight: 800;
+  font-size: 0.78rem;
+}
+
+.rank-1 { background: linear-gradient(135deg, #fbbf24, #d97706); color: #000; box-shadow: 0 0 8px rgba(251, 191, 36, 0.4); }
+.rank-2 { background: linear-gradient(135deg, #f1f5f9, #94a3b8); color: #000; }
+.rank-3 { background: linear-gradient(135deg, #f97316, #b45309); color: #fff; }
+.rank-other { color: var(--text-muted); font-size: 0.82rem; }
+
+.rank-player-name {
+  font-weight: 600;
+  color: #f8fafc;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rank-time-val {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 700;
+  color: #60a5fa;
+}
+
+.rank-hint-tag {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+.rank-hint-none {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.rank-hint-used {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+}
+
+.ranking-status-msg {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   自社アプリ紹介バナー（邪魔にならず自然に溶け込むカード）
+   ========================================================================== */
+.promo-banner {
+  --app-accent: #6366f1;
+  width: 100%;
+  background: linear-gradient(90deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.85) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 3px solid var(--app-accent, #6366f1);
+  border-radius: 12px;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  position: relative;
+  margin-top: 6px;
+  transition: all 0.25s ease;
+  container-type: inline-size;
+  container-name: promo;
+}
+
+.promo-banner:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+  border-left-color: var(--app-accent, #6366f1);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+}
+
+.promo-badge {
+  position: absolute;
+  top: -8px;
+  left: 12px;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: white;
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 1px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.4);
+  z-index: 2;
+  white-space: nowrap;
+}
+
+.promo-body {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.promo-img-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 9px;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: transform 0.2s ease, opacity 0.25s ease;
+}
+
+.promo-banner:hover .promo-img-icon {
+  transform: scale(1.05);
+}
+
+.promo-info {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.promo-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #f8fafc;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.promo-subname {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.promo-category-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(99, 102, 241, 0.18);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.promo-desc {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+.promo-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.promo-nav-btns {
+  display: flex;
+  gap: 4px;
+}
+
+.promo-nav-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-muted, #94a3b8);
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.promo-nav-btn:hover {
+  background: var(--app-accent, #6366f1);
+  color: white;
+  border-color: var(--app-accent, #6366f1);
+}
+
+.promo-cta-btn {
+  flex-shrink: 0;
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.3), rgba(99, 102, 241, 0.2));
+  color: #a5b4fc;
+  border: 1px solid rgba(165, 180, 252, 0.35);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.promo-cta-btn:hover {
+  background: #4f46e5;
+  color: #ffffff;
+  border-color: #6366f1;
+  box-shadow: 0 2px 10px rgba(79, 70, 229, 0.5);
+  transform: translateY(-1px);
+}
+
+.win-promo-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  margin-right: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* レスポンシブ対応（コンテナ幅または画面幅に応じた最適化） */
+@container promo (max-width: 540px) {
+  .promo-desc {
+    display: none;
+  }
+}
+
+@container promo (max-width: 400px) {
+  .promo-nav-btns {
+    display: none;
+  }
+  .promo-subname {
+    display: none;
+  }
+}
+
+@media (max-width: 540px) {
+  .promo-desc {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .promo-nav-btns {
+    display: none;
+  }
+  .promo-subname {
+    display: none;
+  }
+  .promo-banner {
+    padding: 7px 10px;
+  }
+  .promo-cta-btn {
+    padding: 5px 8px;
+    font-size: 0.7rem;
+  }
+}
+  .modal-card.modal-large {
+    padding: 16px 12px;
+  }
+  .ranking-filters-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+
